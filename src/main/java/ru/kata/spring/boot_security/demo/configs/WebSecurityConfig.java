@@ -23,7 +23,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/", "/index").permitAll()
+                .antMatchers("/authenticated/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin().successHandler(successUserHandler)
@@ -40,9 +40,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         UserDetails user =
                 User.withDefaultPasswordEncoder()
                         .username("user")
-                        .password("user")
+                        .password("{bcrypt}$2a$12$fO6I6UdMPjmIEkUsBQ82/OFtU7hyycbHf6fhVLhQD6q04b1.ynima")
                         .roles("USER")
                         .build();
+        User.withDefaultPasswordEncoder()
+                .username("admin")
+                .password("{bcrypt}$2a$12$fO6I6UdMPjmIEkUsBQ82/OFtU7hyycbHf6fhVLhQD6q04b1.ynima")
+                .roles("ADMIN","USER")
+                .build();
 
         return new InMemoryUserDetailsManager(user);
     }
