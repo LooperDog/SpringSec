@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить пользователя</title>
+</head>
+<body>
+<h2>Добавить пользователя</h2>
+
+<!-- Кнопка выхода -->
+<form th:action="@{/logout}" method="post">
+    <input type="submit" value="Выйти">
+</form>
+
+<br>
+
+<!-- Форма добавления пользователя -->
+<form method="POST" th:action="@{/add}" th:object="${user}">
+    <fieldset>
+        <legend>Данные пользователя</legend>
+
+        <label for="username">Имя</label>
+        <input type="text" th:field="*{username}" id="username" required/>
+        <br>
+
+        <label for="lastName">Фамилия</label>
+        <input type="text" th:field="*{lastname}" id="lastName" required/>
+        <br>
+
+        <label for="email">Email</label>
+        <input type="email" th:field="*{email}" id="email" required/>
+        <br>
+
+        <label for="password">Пароль</label>
+        <input type="password" th:field="*{password}" id="password" required/>
+        <br>
+
+        <!-- Выбор ролей -->
+        <label for="roles">Роли:</label>
+        <select multiple th:field="*{roles}" id="roles">
+            <option value="ROLE_ADMIN">ADMIN</option>
+            <option value="ROLE_USER" selected>USER</option>
+        </select>
+        <br>
+
+    </fieldset>
+
+    <br>
+    <button type="submit">Сохранить пользователя</button>
+</form>
+
+<br>
+
+<!-- Кнопка "Назад" -->
+<form th:action="@{/admin}">
+    <button type="submit">Назад к списку пользователей</button>
+</form>
+
+</body>
+</html>

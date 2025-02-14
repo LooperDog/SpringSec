@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Page</title>
+</head>
+<body>
+<h1>Admin Panel</h1>
+<table>
+    <tr>
+        <th>ID</th><th>Username</th><th>Roles</th><th>Actions</th>
+    </tr>
+    <tr th:each="user : ${users}">
+        <td th:text="${user.id}"></td>
+        <td th:text="${user.username}"></td>
+        <td th:text="${user.roles}"></td>
+        <td>
+            <form th:action="@{/admin/delete/{id}(id=${user.id})}" method="post">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+</table>
+<form action="/admin/add" method="post">
+    <input type="text" name="username" placeholder="Username">
+    <input type="password" name="password" placeholder="Password">
+    <button type="submit">Add User</button>
+</form>
+<a href="/logout">Logout</a>
+</body>
+</html>

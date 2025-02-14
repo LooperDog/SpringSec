@@ -1,54 +1,57 @@
 package ru.kata.spring.boot_security.demo.configs;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final SuccessUserHandler successUserHandler;
+    private final UserDetailsService userDetailsService;
+    private final AppConfig appConfig;
 
-    public WebSecurityConfig(SuccessUserHandler successUserHandler) {
+    public WebSecurityConfig(SuccessUserHandler successUserHandler,
+                             @Qualifier("userServiceImpl") UserDetailsService userDetailsService, AppConfig appConfig) {
         this.successUserHandler = successUserHandler;
+        this.userDetailsService = userDetailsService;
+        this.appConfig = appConfig;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .cors().disable()
+                .csrf().disable() //  защита от CSRF-атак( типо подставного сайта где злоумышленник его использует и заставляет
+                // от имени пользователя отправлять пароли, деньги со счёта на счёт и т.п
                 .authorizeRequests()
-                .antMatchers("/authenticated/**").permitAll()
-                .anyRequest().authenticated()
+                .antMatchers("/login", "/").permitAll()
+                .antMatchers("/user/**").hasAnyRole("USER", "ADMIN") //прописываем доступ для юрл /user/**
+                .antMatchers("/admin/**").hasRole("ADMIN") //прописываем доступ для юрл /admin/**
+                .anyRequest().authenticated() // все запросы должны быть авторизованы и аутентифицированы
                 .and()
-                .formLogin().successHandler(successUserHandler)
-                .permitAll()
+                .formLogin() // задаю форму для ввода логина-пароля, по дефолту это "/login"
+                .successHandler(successUserHandler)
+                .permitAll() // доступно всем
                 .and()
-                .logout()
-                .permitAll();
+                .logout().permitAll(); // настройка логаута
     }
-
-    // аутентификация inMemory
     @Bean
-    @Override
-    public UserDetailsService userDetailsService() {
-        UserDetails user =
-                User.withDefaultPasswordEncoder()
-                        .username("user")
-                        .password("{bcrypt}$2a$12$fO6I6UdMPjmIEkUsBQ82/OFtU7hyycbHf6fhVLhQD6q04b1.ynima")
-                        .roles("USER")
-                        .build();
-        User.withDefaultPasswordEncoder()
-                .username("admin")
-                .password("{bcrypt}$2a$12$fO6I6UdMPjmIEkUsBQ82/OFtU7hyycbHf6fhVLhQD6q04b1.ynima")
-                .roles("ADMIN","USER")
-                .build();
-
-        return new InMemoryUserDetailsManager(user);
+    protected DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+        daoAuthenticationProvider.setUserDetailsService(userDetailsService);
+        daoAuthenticationProvider.setPasswordEncoder(appConfig.passwordEncoder());
+        return daoAuthenticationProvider;
     }
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(daoAuthenticationProvider());
+    }
+
 }
