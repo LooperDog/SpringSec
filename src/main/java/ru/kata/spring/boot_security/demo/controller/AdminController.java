@@ -22,7 +22,7 @@ public class AdminController {
     }
     @GetMapping
     public String homeAdmin(){
-        return "redirect:/admin/user";
+        return "redirect:/admin/users";
     }
     @GetMapping("users")
     public String pageUser(Model model){
@@ -41,7 +41,7 @@ public class AdminController {
                              @RequestParam(value = "roles") String[] roles){
         user.setRoles(roleService.getSetOfRoles(roles));
              userService.addUser(user);
-             return "redirect:/admin/user";
+             return "redirect:/admin/users";
     }
 
 

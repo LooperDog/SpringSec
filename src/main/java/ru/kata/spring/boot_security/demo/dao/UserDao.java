@@ -14,4 +14,5 @@ public interface UserDao {
 
     void removeUserById(Long id);
     List<User> listUsers();
+    Long countUsers();
 }
