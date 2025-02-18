@@ -69,11 +69,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userDao.getUserByEmail(email);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userDao.findByUsername(username);
         if (user == null) {
-            throw new UsernameNotFoundException("Пользователь с почтой: " + email + " не найден!");
+            throw new UsernameNotFoundException("Пользователь с почтой: " + username + " не найден!");
         }
-        return new User();
+        return user;
     }
 }
