@@ -12,7 +12,7 @@ import ru.kata.spring.boot_security.demo.entities.User;
 
 import java.util.List;
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final UserDao userDao;
@@ -26,14 +26,21 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     @Transactional(readOnly = true)
+    public User findByUsername(String username) {
+        return userDao.findByUsername(username);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public User getUserByEmail(String email) {
         return userDao.getUserByEmail(email);
     }
 
     @Override
+    @Transactional
     public void addUser(User user) {
-        userDao.addUser(user);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userDao.addUser(user);
     }
 
     @Override

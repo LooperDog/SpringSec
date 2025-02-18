@@ -3,12 +3,11 @@ package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import ru.kata.spring.boot_security.demo.dao.RoleDao;
-import ru.kata.spring.boot_security.demo.dao.UserDao;
 import ru.kata.spring.boot_security.demo.entities.Role;
 import ru.kata.spring.boot_security.demo.entities.User;
+import ru.kata.spring.boot_security.demo.service.RoleService;
+import ru.kata.spring.boot_security.demo.service.UserService;
 
 import javax.annotation.PostConstruct;
 import java.util.HashSet;
@@ -16,25 +15,33 @@ import java.util.Set;
 
 
 @Component
-
 public class DbInitController {
 
-    private final UserDao userDao;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
-    private final RoleDao roleDao;
+    private final RoleService roleService;
 
-    public DbInitController(UserDao userDao, PasswordEncoder passwordEncoder, RoleDao roleDao) {
-        this.userDao = userDao;
+    public DbInitController(UserService userService, PasswordEncoder passwordEncoder, RoleService roleService) {
+        this.userService = userService;
         this.passwordEncoder = passwordEncoder;
-        this.roleDao = roleDao;
+        this.roleService = roleService;
     }
+
     @Transactional
     @PostConstruct
     public void initDatabase() {
-        if(userDao.countUsers() == 0) {
-            Role adminRole = roleDao.getRoleByName("ROLE_ADMIN");
-            if(adminRole != null) {
-                roleDao.deleteRole(adminRole);
+
+        if (userService.findByUsername("admin") == null) {
+            Role adminRole = roleService.getRoleByName("ROLE_ADMIN");
+            if (adminRole == null) {
+                adminRole = new Role("ROLE_ADMIN");
+                roleService.addRole(adminRole);
+            }
+
+            Role userRole = roleService.getRoleByName("ROLE_USER");
+            if (userRole == null) {
+                userRole = new Role("ROLE_USER");
+                roleService.addRole(userRole);
             }
 
             Set<Role> roles = new HashSet<>();
@@ -47,10 +54,8 @@ public class DbInitController {
             admin.setPassword(passwordEncoder.encode("admin"));
             admin.setRoles(roles);
 
-            userDao.addUser(admin);
+            userService.addUser(admin);
             System.out.println("Юзер был успешно создан");
-
-
         }
     }
 }

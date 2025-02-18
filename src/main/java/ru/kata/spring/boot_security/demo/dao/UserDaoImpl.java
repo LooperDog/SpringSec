@@ -29,6 +29,16 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
+    public User findByUsername(String name) {
+        return entityManager.createQuery(
+                        "SELECT user FROM User user JOIN FETCH user.roles WHERE user.username = :name", User.class)
+                .setParameter("name", name)
+                .getResultStream()
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
     public void addUser(User user) {
         entityManager.persist(user);
     }
@@ -51,10 +61,5 @@ public class UserDaoImpl implements UserDao {
     @Override
     public List<User> listUsers() {
         return entityManager.createQuery("select user from User user", User.class).getResultList();
-    }
-
-    @Override
-    public Long countUsers() {
-        return entityManager.createQuery("select count(user) from User user", Long.class).getSingleResult();
     }
 }

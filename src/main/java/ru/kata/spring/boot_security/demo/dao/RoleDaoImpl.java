@@ -1,6 +1,7 @@
 package ru.kata.spring.boot_security.demo.dao;
 
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.entities.Role;
 
 import javax.persistence.EntityManager;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
+@Transactional
 public class RoleDaoImpl implements RoleDao {
 
     @PersistenceContext
@@ -24,7 +26,10 @@ public class RoleDaoImpl implements RoleDao {
     @Override
     public Role getRoleByName(String roleName) {
         return entityManager.createQuery("select r from Role r where r.name=:roleName", Role.class)
-                .setParameter("roleName", roleName).getSingleResult();
+                .setParameter("roleName", roleName)
+                .getResultStream()
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
@@ -47,7 +52,8 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
+    @Transactional
     public void deleteRole(Role role) {
-        entityManager.merge(role);
+        entityManager.remove(entityManager.merge(role));
     }
 }

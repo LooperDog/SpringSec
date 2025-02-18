@@ -1,10 +1,11 @@
 package ru.kata.spring.boot_security.demo.dao;
 
+import org.springframework.data.jpa.repository.Query;
 import ru.kata.spring.boot_security.demo.entities.User;
 
 import java.util.List;
 
-public interface UserDao {
+public interface UserDao  {
 
     User getUserByEmail(String email);
     void addUser(User user);
@@ -14,5 +15,5 @@ public interface UserDao {
 
     void removeUserById(Long id);
     List<User> listUsers();
-    Long countUsers();
+    User findByUsername(String name);
 }
