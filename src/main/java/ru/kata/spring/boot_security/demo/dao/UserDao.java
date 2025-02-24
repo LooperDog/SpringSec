@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.Query;
 import ru.kata.spring.boot_security.demo.entities.User;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserDao  {
 
@@ -15,5 +16,5 @@ public interface UserDao  {
 
     void removeUserById(Long id);
     List<User> listUsers();
-    User findByUsername(String name);
+    Optional<User> findByUsername(String name);
 }

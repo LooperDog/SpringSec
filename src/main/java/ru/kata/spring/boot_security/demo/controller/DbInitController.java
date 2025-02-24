@@ -1,5 +1,3 @@
-package ru.kata.spring.boot_security.demo.controller;
-
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -51,7 +49,7 @@ public class DbInitController {
             admin.setUsername("admin");
             admin.setLastName("Adminov");
             admin.setEmail("admin@example.com");
-            admin.setPassword(passwordEncoder.encode("admin"));
+            admin.setPassword("admin");
             admin.setRoles(roles);
 
             userService.addUser(admin);

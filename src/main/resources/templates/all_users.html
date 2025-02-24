@@ -1,54 +1,84 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-
-
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <title>Админ. Все пользователи</title>
+  <!-- Подключаем Bootstrap -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <!-- Подключаем Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 </head>
-<body>
-<h2>Привет, Админ. Вот, все пользователи:</h2>
-<div>
+<body class="bg-light">
 
-  <hr/>
-  <table>
-    <tr>
-      <th>Id</th>
-      <th>Имя</th>
-      <th>Фамилия</th>
-      <th>Электронная почта</th>
-      <th>Роль</th>
-    </tr>
+<div class="container mt-5">
+  <div class="card shadow-lg">
+    <div class="card-header bg-primary text-white text-center">
+      <h2>Привет, Админ! Вот все пользователи:</h2>
+    </div>
+    <div class="card-body">
 
-    <tr th:each="user : ${userSet}">
-      <td th:text="${user.getId()}">Id</td>
-      <td th:text="${user.getName()}">Имя</td>
-      <td th:text="${user.getLastName()}">Фамилия</td>
-      <td th:text="${user.getEmail()}">Электронная почта</td>
-      <td th:text="${user.getRoles()}">Роль</td>
+      <!-- Таблица пользователей -->
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+          <thead class="table-dark">
+          <tr>
+            <th>Id</th>
+            <th>Имя</th>
+            <th>Фамилия</th>
+            <th>Электронная почта</th>
+            <th>Роль</th>
+            <th class="text-center">Действия</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="user : ${setUser}">
+            <td th:text="${user.id}"></td>
+            <td th:text="${user.username}"></td>
+            <td th:text="${user.lastName}"></td>
+            <td th:text="${user.email}"></td>
+            <td>
+              <span class="badge bg-secondary" th:each="role : ${user.roles}" th:text="${role.name}"></span>
+            </td>
+            <td class="text-center">
+              <!-- Кнопка редактирования -->
+              <a th:href="@{/admin/users/{id}/edit(id=${user.id})}" class="btn btn-warning btn-sm">
+                <i class="bi bi-pencil"></i> Изменить
+              </a>
 
-      <td>
-        <form th:action="@{/admin/users/{id}/edit(id=${user.id})}" th:object="${user}">
-          <button style="background: mintcream" type="submit">Изменить</button>
+              <!-- Кнопка удаления -->
+              <form th:action="@{/admin/users/{id}/delete(id=${user.id})}" th:method="post" class="d-inline">
+                <input type="hidden" name="_method" value="DELETE"/>
+                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Вы уверены?');">
+                  <i class="bi bi-trash"></i> Удалить
+                </button>
+              </form>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Кнопка добавления нового пользователя -->
+      <div class="text-center mt-3">
+        <a href="/admin/users/add" class="btn btn-success">
+          <i class="bi bi-person-plus"></i> Добавить нового пользователя
+        </a>
+      </div>
+
+      <!-- Кнопка выхода -->
+      <div class="text-center mt-3">
+        <form th:action="@{/logout}" method="post">
+          <button class="btn btn-secondary">
+            <i class="bi bi-box-arrow-right"></i> Выйти
+          </button>
         </form>
-      </td>
-      <td>
-        <form th:method="DELETE" th:action="@{/admin/users/{id}/delete(id=${user.id})}">
-          <input type="hidden" name="id" th:value="${user.id}">
-          <button style="background: moccasin" type="submit" value="Delete">Удалить</button>
-        </form>
-      </td>
-    </tr>
-  </table>
-  <br>
-  <form th:action="@{/admin/users/add}">
-    <button style="background: lightgray" type="submit">Добавить нового пользователя</button>
-  </form>
-  <br>
-  <form th:action="@{/logout}" method="post">
-    <input style="background: lightgray" type="submit" value="Выйти">
-  </form>
+      </div>
+
+    </div>
+  </div>
 </div>
 
+<!-- Подключаем Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

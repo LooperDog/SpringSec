@@ -3,6 +3,7 @@ package ru.kata.spring.boot_security.demo.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.entities.User;
 import ru.kata.spring.boot_security.demo.service.RoleService;
@@ -20,6 +21,7 @@ public class AdminController {
         this.userService = userService;
         this.roleService = roleService;
     }
+
     @GetMapping
     public String homeAdmin(){
         return "redirect:/admin/users";
@@ -31,7 +33,7 @@ public class AdminController {
     }
 
     @GetMapping(value = "/users/add")
-    public String addUser(@ModelAttribute("users") User user, Model model){
+    public String addUser(@ModelAttribute("user") User user, Model model){
         model.addAttribute("roles", roleService.getAllRoles());
         return "add";
     }
@@ -44,5 +46,30 @@ public class AdminController {
              return "redirect:/admin/users";
     }
 
+    @GetMapping("/users/{id}/edit")
+    public String editUser(@PathVariable("id") Long id, Model model) {
+        model.addAttribute("user", userService.getUserById(id));
+        model.addAttribute("roles", roleService.getAllRoles());
+        return "edit";
+    }
+
+    @PatchMapping("/users/{id}/edit")
+    public String updateEdit(@ModelAttribute("user") User user,
+                             @RequestParam(value = "roles") String[] roles) {
+        user.setRoles(roleService.getSetOfRoles(roles));
+        userService.updateUser(user);
+        return "redirect:/admin/users";
+    }
+
+    @DeleteMapping("users/{id}/delete")
+    public String deleteUser(@PathVariable("id") Long id){
+        userService.removeUserById(id);
+        return "redirect:/admin/users";
+    }
+    @GetMapping("users/{id}")
+    public String showAllUsers(@PathVariable("id") Long id, ModelMap modelMap){
+        modelMap.addAttribute("user", userService.getUserById(id));
+        return "show_users_by_id";
+    }
 
 }

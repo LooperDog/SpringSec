@@ -1,6 +1,5 @@
 package ru.kata.spring.boot_security.demo.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,16 +17,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserDao userDao;
     private final PasswordEncoder passwordEncoder;
 
-    @Autowired
+
     public UserServiceImpl(UserDao userDao, PasswordEncoder passwordEncoder) {
         this.userDao = userDao;
         this.passwordEncoder = passwordEncoder;
     }
 
+
     @Override
     @Transactional(readOnly = true)
     public User findByUsername(String username) {
-        return userDao.findByUsername(username);
+        return userDao.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользовыатель с таким именем: " +username+ " не найден!!!") );
     }
 
     @Override
@@ -44,20 +45,25 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public User getUserById(Long id) {
         return userDao.getUserById(id);
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public void updateUser(User user) {
+        User userChanged = userDao.getUserById(user.getId());
+        if(!userChanged.getPassword().equals(user.getPassword())) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
         userDao.updateUser(user);
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public void removeUserById(Long id) {
+
         userDao.removeUserById(id);
     }
 
@@ -70,10 +76,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userDao.findByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("Пользователь с почтой: " + username + " не найден!");
-        }
-        return user;
+        return findByUsername(username);
+
+
     }
 }

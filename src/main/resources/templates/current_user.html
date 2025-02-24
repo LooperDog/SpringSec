@@ -1,34 +1,31 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>User</title>
-  <h2>Привет, друг! Ниже информация о тебе:</h2>
+  <title>Профиль пользователя</title>
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
-<body>
+<body class="container mt-5">
 
-<table border="2">
-  <thead>
-  <tr>
-    <th>ID</th>
-    <th>Имя</th>
-    <th>Фамилия</th>
-    <th>Электронная почта</th>
-  </tr>
+<div class="card p-4">
+  <h2>Добро пожаловать, <span th:text="${user.username}">Пользователь</span>!</h2>
+  <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+  <p><strong>Фамилия:</strong> <span th:text="${user.lastName}"></span></p>
 
-  </thead>
-  <tbody>
-  <tr>
-    <td th:utext="${user.getId()}">id</td>
-    <td th:utext="${user.getName()}">Имя</td>
-    <td th:utext="${user.getLastName()}">Фамилия</td>
-    <td th:utext="${user.getEmail()}">Электронная почта</td>
-  </tr>
-  </tbody>
-</table>
-<br>
-<form th:action="@{'/logout'}">
-  <input type="submit" value="Logout"/>
-</form>
+  <!-- Отображение ролей -->
+  <p><strong>Роли:</strong>
+    <span th:each="role : ${user.roles}" th:text="${role.name} + ' '"></span>
+  </p>
+
+  <!-- Кнопка выхода -->
+  <form th:action="@{/logout}" method="post">
+    <button type="submit" class="btn btn-danger">Выйти</button>
+  </form>
+
+  <!-- Кнопка возврата на главную -->
+  <a th:href="@{/}" class="btn btn-primary mt-2">На главную</a>
+</div>
+
 </body>
 </html>

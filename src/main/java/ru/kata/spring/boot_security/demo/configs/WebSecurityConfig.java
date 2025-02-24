@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.filter.HiddenHttpMethodFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -25,14 +26,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    protected void configure(HttpSecurity http) throws Exception { // конфиги в которых указывается доступы пользователей
         http
                 .cors().disable()
                 .csrf().disable() //  защита от CSRF-атак( типо подставного сайта где злоумышленник его использует и заставляет
                 // от имени пользователя отправлять пароли, деньги со счёта на счёт и т.п
-                .authorizeRequests()
+                .authorizeRequests() //авторизацуем запрос
                 .antMatchers("/login", "/").permitAll()
-                .antMatchers("/user/**").hasAnyRole("USER", "ADMIN") //прописываем доступ для юрл /user/**
+                .antMatchers("/users/**").hasAnyRole("USER", "ADMIN") //прописываем доступ для юрл /user/**
                 .antMatchers("/admin/**").hasRole("ADMIN") //прописываем доступ для юрл /admin/**
                 .anyRequest().authenticated() // все запросы должны быть авторизованы и аутентифицированы
                 .and()
@@ -52,6 +53,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(daoAuthenticationProvider());
+    }
+
+    @Bean
+    public HiddenHttpMethodFilter hiddenHttpMethodFilter() {
+        return new HiddenHttpMethodFilter();
     }
 
 }
