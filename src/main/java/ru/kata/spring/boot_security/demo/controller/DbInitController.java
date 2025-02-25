@@ -1,4 +1,6 @@
 
+package ru.kata.spring.boot_security.demo.controller;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,18 +31,24 @@ public class DbInitController {
     @PostConstruct
     public void initDatabase() {
 
-        if (userService.findByUsername("admin") == null) {
-            Role adminRole = roleService.getRoleByName("ROLE_ADMIN");
-            if (adminRole == null) {
-                adminRole = new Role("ROLE_ADMIN");
-                roleService.addRole(adminRole);
-            }
+        Role adminRole = roleService.getRoleByName("ROLE_ADMIN");
+        if (adminRole == null) {
+            adminRole = new Role("ROLE_ADMIN");
+            roleService.addRole(adminRole);
+            System.out.println("Роль ADMIN создана!");
+        }
 
-            Role userRole = roleService.getRoleByName("ROLE_USER");
-            if (userRole == null) {
-                userRole = new Role("ROLE_USER");
-                roleService.addRole(userRole);
-            }
+        Role userRole = roleService.getRoleByName("ROLE_USER");
+        if (userRole == null) {
+            userRole = new Role("ROLE_USER");
+            roleService.addRole(userRole);
+            System.out.println("Роль USER создана!");
+        }
+
+        try {
+            userService.findByUsername("admin");
+            System.out.println("Пользователь ADMIN уже существует");
+        } catch (org.springframework.security.core.userdetails.UsernameNotFoundException e) {
 
             Set<Role> roles = new HashSet<>();
             roles.add(adminRole);
