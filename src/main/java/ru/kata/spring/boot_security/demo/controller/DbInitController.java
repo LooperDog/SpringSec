@@ -1,5 +1,5 @@
 
-package ru.kata.spring.boot_security.demo.controller;
+//package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;

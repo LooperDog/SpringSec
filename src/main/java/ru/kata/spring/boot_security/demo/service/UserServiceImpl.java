@@ -40,8 +40,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     @Transactional
     public void addUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userDao.addUser(user);
+        System.out.println("Сохранение пользователя: " + user.getUsername());
+        try {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            System.out.println("Пароль закадирован: " + user.getPassword());
+            userDao.addUser(user);
+            System.out.println("Пользователь: " + user.getPassword() + " был добавлен в БД");
+        } catch (Exception e) {
+            System.out.println("Произошла ошибка при сохрании пользователя!! " + e.getMessage());
+            throw e;
+        }
+
     }
 
     @Override
@@ -68,7 +77,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public List<User> listUsers() {
         return userDao.listUsers();
     }

@@ -26,22 +26,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception { // конфиги в которых указывается доступы пользователей
+    protected void configure(HttpSecurity http) throws Exception {
         http
                 .cors().disable()
-                .csrf().disable() //  защита от CSRF-атак( типо подставного сайта где злоумышленник его использует и заставляет
-                // от имени пользователя отправлять пароли, деньги со счёта на счёт и т.п
-                .authorizeRequests() //авторизацуем запрос
-                .antMatchers("/login", "/").permitAll()
-                .antMatchers("/users/**").hasAnyRole("USER", "ADMIN") //прописываем доступ для юрл /user/**
-                .antMatchers("/admin/**").hasRole("ADMIN") //прописываем доступ для юрл /admin/**
-                .anyRequest().authenticated() // все запросы должны быть авторизованы и аутентифицированы
+                .csrf().disable()
+                .authorizeRequests()
+                .antMatchers("/login", "/", "/create_first_user").permitAll() // Разрешаем доступ к этим путям
+                .antMatchers("/users/**").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
                 .and()
-                .formLogin() // задаю форму для ввода логина-пароля, по дефолту это "/login"
+                .formLogin()
                 .successHandler(successUserHandler)
-                .permitAll() // доступно всем
+                .permitAll()
                 .and()
-                .logout().permitAll(); // настройка логаута
+                .logout().permitAll();
     }
     @Bean
     protected DaoAuthenticationProvider daoAuthenticationProvider() {
